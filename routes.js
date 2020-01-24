@@ -11,11 +11,14 @@ const server = http.createServer(app);
 const io = require('socket.io')(server);
 
 
+require('dotenv/config');
+
+
 var connection = mysql.createPool({
-    host: 'localhost', // O host do banco. Ex: localhost
-    user: 'root', // Um usuário do banco. Ex: user 
-    password: 'Aventureiro123', // A senha do usuário. Ex: user123
-    database: 'mecanica', // A base de dados a qual a aplicação irá se conectar, deve ser a mesma onde foi executado o Código 1. Ex: node_mysql
+    host: process.env.HOST, 
+    user: process.env.USER, 
+    password: process.env.PASSWORD,
+    database: process.env.DATABASE, 
 
 });
 
