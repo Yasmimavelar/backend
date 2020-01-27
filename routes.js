@@ -3,7 +3,6 @@ var mysql = require('mysql');
 var express = require('express');
 var bodyParser = require('body-parser');
 var cors = require('cors');
-var data = new Date();
 const port = process.env.PORT || 8080;
 var http = require('http');
 var app = express();
@@ -33,7 +32,8 @@ io.on('connection', socket => {
 
   //CHART
   socket.on('initialChart', () => {
-    connection.query('SELECT * FROM chart', function(err, row, fields) {
+    connection.query("insert into chart (dia) values date(now())");
+    connection.query('SELECT * FROM chart WHERE WEEK(dia,1) = WEEK(now(),1);', function(err, row, fields) {
       socket.emit('getChart', row)
     });
   });
@@ -48,7 +48,7 @@ io.on('connection', socket => {
   });
 
   socket.on('updateTarefas', object => {
-    connection.query("update chart set lineMecanica = "+ object.lineMecanica +" where dia = ('"+data.getFullYear()+"-"+ data.getMonth()+ 1 +"-"+data.getDate()+"');", () => {
+    connection.query("update chart set lineMecanica = "+ object.lineMecanica +" where dia = date(now());", () => {
       socket.broadcast.emit('changeChart')
     });
     connection.query("update tarefas set checkin = ("+ object.value +") where tarefa = '" + object.tarefa + "';", () => {
