@@ -48,9 +48,9 @@ io.on('connection', socket => {
   });
 
   socket.on('updateTarefas', object => {
-    connection.query("update chart set lineMecanica = "+ object.lineMecanica +" where dia = date(now());", () => {
+    /*connection.query("update chart set lineMecanica = "+ object.lineMecanica +" where dia = date(now());", () => {
       socket.broadcast.emit('changeChart')
-    });
+    }); */
     connection.query("update tarefas set checkin = ("+ object.value +") where tarefa = '" + object.tarefa + "';", () => {
       socket.broadcast.emit('changeTarefas');
     });
