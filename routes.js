@@ -32,7 +32,7 @@ io.on('connection', socket => {
 
   //CHART
   socket.on('initialChart', () => {
-    connection.query("insert into chart (dia) values date(now())");
+    connection.query("insert into chart (dia) values (date(now()))");
     connection.query('SELECT * FROM chart WHERE WEEK(dia,1) = WEEK(now(),1);', function(err, row, fields) {
       socket.emit('getChart', row)
     });
