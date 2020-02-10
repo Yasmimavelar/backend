@@ -37,10 +37,17 @@ io.on('connection', socket => {
       socket.emit('getChart', row)
     });
   });
+  socket.on('updateChart', lineMecanica => {
+    connection.query("update chart set lineMecanica = "+ lineMecanica +" where dia = date(now());", () => {
+      socket.broadcast.emit('changeChart')
+    });
+
+    
+  });
 
   //TAREFAS
 
-  socket.on('initialTarefas', () => {
+  /*socket.on('initialTarefas', () => {
     connection.query('SELECT * FROM tarefas', function (error, results, fields) {
       if (error) throw error;
       socket.emit('getTarefas', results);
@@ -53,6 +60,26 @@ io.on('connection', socket => {
     });
     connection.query("update tarefas set checkin = ("+ object.value +") where tarefa = '" + object.tarefa + "';", () => {
       socket.broadcast.emit('changeTarefas');
+    });
+  }) */
+  socket.on('initialTarefas', () => {
+    connection.query('SELECT HIGH_PRIORITY * FROM tarefas where categoria = "Mecanica" ORDER BY prazo', function (error, results, fields) {
+      if (error) throw error;
+      socket.emit('getTarefas', results);
+    });
+  });
+
+  socket.on('initialCheckin', () => {
+    connection.query('select categoria, count(checkin) as checkin from tarefas where checkin = true group by categoria', function (error, results, fields) {
+      if (error) throw error;
+      socket.emit('getCheckin', results);
+    });
+  });
+
+  socket.on('updateTarefas', object => {
+    connection.query("update tarefas set checkin = ("+ object.value +") where tarefa = '" + object.tarefa + "';", () => {
+      socket.broadcast.emit('changeTarefas');
+      socket.broadcast.emit('changeCheckin');
     });
   })
 
