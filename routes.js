@@ -46,22 +46,6 @@ io.on('connection', socket => {
   });
 
   //TAREFAS
-
-  /*socket.on('initialTarefas', () => {
-    connection.query('SELECT * FROM tarefas', function (error, results, fields) {
-      if (error) throw error;
-      socket.emit('getTarefas', results);
-    });
-  });
-
-  socket.on('updateTarefas', object => {
-    connection.query("update chart set lineMecanica = "+ object.lineMecanica +" where dia = date(now());", () => {
-      socket.broadcast.emit('changeChart')
-    });
-    connection.query("update tarefas set checkin = ("+ object.value +") where tarefa = '" + object.tarefa + "';", () => {
-      socket.broadcast.emit('changeTarefas');
-    });
-  }) */
   socket.on('initialTarefas', () => {
     connection.query('SELECT HIGH_PRIORITY * FROM tarefas where categoria = "Mecanica" ORDER BY prazo', function (error, results, fields) {
       if (error) throw error;
