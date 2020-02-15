@@ -20,8 +20,10 @@ var connection = mysql.createPool({
 app.use(cors());
 app.use(bodyParser());
 
-io.on('connection', socket => {
-  //TAREFAS
+//TAREFAS
+io.of('test').on('connection', socket => {
+  console.log('connected')
+
   socket.on('updateTarefas', object => {
     connection.query("update tarefas set checkin = ("+ object.value +") where tarefa = '" + object.tarefa + "';", () => {
       socket.broadcast.emit('changeTarefas');
@@ -74,20 +76,20 @@ io.on('connection', socket => {
       socket.emit('getCheckin', results);
     });
   });
-  //CHART
-  socket.on('initialChart', () => {
-    connection.query("insert into chart (dia) values (date(now()))");
-    connection.query('SELECT * FROM chart WHERE WEEK(dia,1) = WEEK(now(),1);', function(err, row, fields) {
-      socket.emit('getChart', row)
-    });
-  });
 
   socket.on('updateChart', lineMecanica => {
     connection.query("update chart set lineMecanica = "+ lineMecanica +" where dia = date(now());", () => {
       socket.broadcast.emit('changeChart')
     });
   });
-  //COMENTARIOS
+
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+  });
+});
+
+//COMENTARIOS
+io.of('/comentarios').on('connection', socket => {
   socket.on('initialCom', () => {
     connection.query("SELECT * FROM comentarios", function(err, results) {
       if (err) throw err;
@@ -99,17 +101,32 @@ io.on('connection', socket => {
         socket.broadcast.emit('changeCom')
     });
   });
-  // EVENTOS
+})
+
+// EVENTOS
+io.of('/event').on('connection', socket => {
+  console.log('connected')
+
   socket.on('initialEvent', () => {
     connection.query('SELECT * FROM eventos', (err, results) => {
       if (err) throw err;
       socket.emit('getEvento', results)
     })
-  })
-  socket.on("disconnect", () => {
-    console.log("user disconnected");
   });
-});
+})
+
+//CHART
+io.of('chart').on('connection', socket => {
+  console.log('connected')
+
+  socket.on('initialChart', () => {
+    connection.query("insert into chart (dia) values (date(now()))");
+    connection.query('SELECT * FROM chart WHERE WEEK(dia,1) = WEEK(now(),1);', function(err, row, fields) {
+      socket.emit('getChart', row)
+    });
+  });
+  
+})
 
 server.listen(port, () => {
   console.log('API subida com sucesso!');
