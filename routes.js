@@ -21,24 +21,57 @@ app.use(cors());
 app.use(bodyParser());
 
 io.on('connection', socket => {
-
   //TAREFAS
-  socket.on('initialCheckin', () => {
-    connection.query('select categoria, count(checkin) as checkin from tarefas where checkin = true group by categoria', function (error, results, fields) {
-      if (error) throw error;
-      socket.emit('getCheckin', results);
-    });
-  });
   socket.on('updateTarefas', object => {
     connection.query("update tarefas set checkin = ("+ object.value +") where tarefa = '" + object.tarefa + "';", () => {
       socket.broadcast.emit('changeTarefas');
+      socket.broadcast.emit('changeAll');
       socket.broadcast.emit('changeCheckin');
     });
   });
   socket.on('initialTarefas', () => {
-    connection.query('SELECT HIGH_PRIORITY * FROM tarefas where categoria = "Mecanica" ORDER BY prazo', function (error, results, fields) {
+    connection.query('SELECT * FROM tarefas', function (error, results, fields) {
+      if (error) throw error;
+      socket.emit('getAll', results);
+    });
+  });
+    //mecanica
+  socket.on('initialCheckinMecanica', () => {
+    connection.query('select categoria, count(checkin) as checkin from tarefas where checkin = true and categoria = "Mecanica" group by categoria', function (error, results, fields) {
+      if (error) throw error;
+      socket.emit('getCheckin', results);
+    });
+  });
+  socket.on('initialTarefasMecanica', () => {
+    connection.query('SELECT * FROM tarefas where categoria = "Mecanica" ORDER BY prazo', function (error, results, fields) {
       if (error) throw error;
       socket.emit('getTarefas', results);
+    });
+  });
+    //programacao
+  socket.on('initialTarefasProgramacao', () => {
+    connection.query('SELECT * FROM tarefas where categoria = "Programacao" ORDER BY prazo', function (error, results, fields) {
+      if (error) throw error;
+      socket.emit('getTarefas', results);
+    });
+  });
+  socket.on('initialCheckinProgramacao', () => {
+    connection.query('select categoria, count(checkin) as checkin from tarefas where checkin = true and categoria = "Programacao" group by categoria', function (error, results, fields) {
+      if (error) throw error;
+      socket.emit('getCheckin', results);
+    });
+  });
+    //controle
+  socket.on('initialTarefasControle', () => {
+    connection.query('SELECT * FROM tarefas where categoria = "Controle" ORDER BY prazo', function (error, results, fields) {
+      if (error) throw error;
+      socket.emit('getTarefas', results);
+    });
+  });
+  socket.on('initialCheckinControle', () => {
+    connection.query('select categoria, count(checkin) as checkin from tarefas where checkin = true and categoria = "Controle" group by categoria', function (error, results, fields) {
+      if (error) throw error;
+      socket.emit('getCheckin', results);
     });
   });
   //CHART
@@ -80,4 +113,4 @@ io.on('connection', socket => {
 
 server.listen(port, () => {
   console.log('API subida com sucesso!');
- }); 
+});
