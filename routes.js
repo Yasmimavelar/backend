@@ -6,7 +6,9 @@ const port = process.env.PORT || 8080;
 var http = require('http');
 var app = express();
 const server = http.createServer(app);
-const io = require('socket.io')(server);
+const io = require('socket.io')(server, {
+  transports: ['websocket']
+});
 
 require('dotenv/config');
 var connection = mysql.createPool({
@@ -20,6 +22,7 @@ var connection = mysql.createPool({
 app.use(cors());
 app.use(bodyParser());
 
+// socket.io
 app.get('/event', (req, res) => {
   connection.query('SELECT * FROM eventos', (err, results) => {
     res.send(results)
@@ -28,10 +31,9 @@ app.get('/event', (req, res) => {
 
 //TAREFAS
 io.of('test').on('connection', socket => {
-  console.log('connected')
 
   socket.on('updateTarefas', object => {
-    connection.query("update tarefas set checkin = ("+ object.value +") where tarefa = '" + object.tarefa + "';", () => {
+    connection.query(`update tarefas set checkin = (${object.value}) where tarefa = '${object.tarefa}';`, () => {
       socket.broadcast.emit('changeTarefas');
       socket.broadcast.emit('changeAll');
       socket.broadcast.emit('changeCheckin');
