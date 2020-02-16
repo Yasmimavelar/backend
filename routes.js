@@ -20,6 +20,13 @@ var connection = mysql.createPool({
 app.use(cors());
 app.use(bodyParser());
 
+app.get('/event', (req, res) => {
+  connection.query('SELECT * FROM eventos', (err, results) => {
+    res.send(results)
+  });
+})
+
+//TAREFAS
 io.of('test').on('connection', socket => {
   console.log('connected')
 
@@ -77,7 +84,7 @@ io.of('test').on('connection', socket => {
   });
 
   socket.on('updateChart', lineMecanica => {
-    connection.query("update chart set lineMecanica = "+ lineMecanica +" where dia = date(now());", () => {
+    connection.query(`update chart set lineMecanica = ${lineMecanica} where dia = date(now());`, () => {
       socket.broadcast.emit('changeChart')
     });
   });
@@ -120,11 +127,7 @@ io.of('/comentarios').on('connection', socket => {
     })
   });
 }) */
-app.get('/event', (req, res) => {
-  connection.query('SELECT * FROM eventos', (err, results) => {
-    res.send(results)
-  });
-})
+
 
 server.listen(port, () => {
   console.log('API subida com sucesso!');
