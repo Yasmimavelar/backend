@@ -6,9 +6,7 @@ const port = process.env.PORT || 8080;
 var http = require('http');
 var app = express();
 const server = http.createServer(app);
-const io = require('socket.io')(server, {
-  transports: ['websocket']
-});
+const io = require('socket.io')(server);
 
 require('dotenv/config');
 var connection = mysql.createPool({
@@ -30,7 +28,7 @@ app.get('/event', (req, res) => {
 })
 
 //TAREFAS
-io.of('test').on('connection', socket => {
+io.of('tarefas').on('connection', socket => {
 
   socket.on('updateTarefas', object => {
     connection.query(`update tarefas set checkin = (${object.value}) where tarefa = '${object.tarefa}';`, () => {
@@ -117,20 +115,6 @@ io.of('/comentarios').on('connection', socket => {
     });
   });
 })
-
-// EVENTOS
-/*io.of('/event').on('connection', socket => {
-  console.log('connected')
-
-  socket.on('initialEvent', () => {
-    connection.query('SELECT * FROM eventos', (err, results) => {
-      if (err) throw err;
-      socket.emit('getEvento', results)
-    })
-  });
-}) */
-
-
 server.listen(port, () => {
   console.log('API subida com sucesso!');
 });
