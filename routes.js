@@ -91,7 +91,7 @@ io.of('tarefas').on('connection', socket => {
 
   socket.on('initialChart', () => {
     connection.query("insert into chart (dia) values (date(now()))");
-    connection.query('SELECT * FROM chart WHERE WEEK(dia,1) = WEEK(now(),1);', function(err, row, fields) {
+    connection.query('SELECT * FROM chart WHERE WEEK(dia) = WEEK(now());', function(err, row, fields) {
       socket.emit('getChart', row)
     });
   });
@@ -110,7 +110,7 @@ io.of('/comentarios').on('connection', socket => {
     });
   });
   socket.on('markDone', com => {
-    connection.query("INSERT INTO comentarios (comentario) VALUES ('" + com + "')", () => {
+    connection.query(`INSERT INTO comentarios (comentario) VALUES ('${com}')`, () => {
         socket.broadcast.emit('changeCom')
     });
   });
