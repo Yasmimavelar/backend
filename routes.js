@@ -91,7 +91,7 @@ io.of('tarefas').on('connection', socket => {
 
   socket.on('initialChart', () => {
     connection.query("insert into chart (dia) values (date(now()))");
-    connection.query('SELECT * FROM chart WHERE WEEK(dia,7) = WEEK(now(),7);', function(err, row, fields) {
+    connection.query('SELECT * FROM chart WHERE WEEK(dia) = WEEK(now());', function(err, row, fields) {
       socket.emit('getChart', row)
     });
   });
