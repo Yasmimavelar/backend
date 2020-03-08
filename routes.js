@@ -9,7 +9,7 @@ const server = http.createServer(app);
 const io = require('socket.io')(server);
 
 require('dotenv/config');
-var connection = mysql.createPool({
+const connection = mysql.createPool({
     host: process.env.HOST, 
     user: process.env.USER, 
     password: process.env.PASSWORD,
@@ -19,12 +19,39 @@ var connection = mysql.createPool({
 
 app.use(cors());
 app.use(bodyParser());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // socket.io
 app.get('/event', (req, res) => {
   connection.query('SELECT * FROM eventos', (err, results) => {
     res.send(results)
   });
+})
+
+// cadastramento
+
+require('./authController')(app);
+
+// autenticação
+
+app.post('/authenticate', async (req, res) => {
+  const {email, password} = req.body;
+
+  const user = await user.findOne({ email }).select('+password');
+
+  if (!user)
+    return res.status(400).send({error: 'Registro falhado!'});
+
+  if (password != user.password)
+    return res.status(400).send({ error: 'Senha inválida'});
+
+  user.password = undefined;
+
+  const token = jwt.sign({ id: user.id }, authConfig.secret, {
+    expiresIn: 86400,
+  });
+
+  res.send({ user });
 })
 
 //TAREFAS
