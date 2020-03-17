@@ -30,29 +30,8 @@ app.get('/event', (req, res) => {
 
 // cadastramento
 
-require('./authController')(app);
+require('./app/index')(app);
 
-// autenticação
-
-app.post('/authenticate', async (req, res) => {
-  const {email, password} = req.body;
-
-  const user = await user.findOne({ email }).select('+password');
-
-  if (!user)
-    return res.status(400).send({error: 'Registro falhado!'});
-
-  if (password != user.password)
-    return res.status(400).send({ error: 'Senha inválida'});
-
-  user.password = undefined;
-
-  const token = jwt.sign({ id: user.id }, authConfig.secret, {
-    expiresIn: 86400,
-  });
-
-  res.send({ user });
-})
 
 //TAREFAS
 io.of('tarefas').on('connection', socket => {
@@ -136,8 +115,8 @@ io.of('/comentarios').on('connection', socket => {
       socket.emit('getCom',results)
     });
   });
-  socket.on('markDone', com => {
-    connection.query(`INSERT INTO comentarios (comentario) VALUES ('${com}')`, () => {
+  socket.on('markDone', (com, user) => {
+    connection.query(`INSERT INTO comentarios (comentario, user) VALUES ('${com}','${user}')`, () => {
         socket.broadcast.emit('changeCom')
     });
   });
