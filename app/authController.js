@@ -35,7 +35,7 @@ router.post('/register', async (req, res) => {
 
           connection.query(`select * from user where email = '${req.body.email}'`, (error, user) => {
 
-            return res.send({ id: user[0].id, token: generateToken({ id: user.id }) });
+            return res.send({ id: user[0].id, token: generateToken({ id: user.id }), name: user[0].username });
           })
 
         });
