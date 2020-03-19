@@ -116,7 +116,7 @@ io.of('/comentarios').on('connection', socket => {
     });
   });
   socket.on('markDone', (com, user, id) => {
-    connection.query(`INSERT INTO comentarios (comentario, user, id_user) VALUES ('${com}','${user}', ${id})`, () => {
+    connection.query(`INSERT INTO comentarios (comentario, user, id_user) VALUES ('${com}','${user}', ${parseInt(id)})`, () => {
         socket.broadcast.emit('changeCom')
     });
   });
