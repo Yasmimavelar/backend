@@ -43,6 +43,9 @@ io.of('tarefas').on('connection', socket => {
       socket.broadcast.emit('changeCheckin');
     });
   });
+  socket.on('updateAluno', (aluno, tarefa) => {
+    connection.query(`update tarefas set fk_aluno = (${aluno}) where tarefa = '${tarefa}';`);
+  });
   socket.on('initialTarefas', () => {
     connection.query('SELECT * FROM tarefas', function (error, results, fields) {
       if (error) throw error;
