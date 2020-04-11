@@ -46,6 +46,7 @@ io.of('tarefas').on('connection', socket => {
   socket.on('updateAluno', object => {
     connection.query(`update tarefas set fk_aluno = (${object.aluno}) where tarefa = '${object.tarefa}';`, () => {
       socket.emit('feedback')
+      console.log(object)
     });
   });
 
